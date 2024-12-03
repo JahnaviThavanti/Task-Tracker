@@ -1,0 +1,87 @@
+/* Container for the entire form */
+.add-task-form {
+  display: flex;           /* Use flexbox for layout */
+  flex-direction: column;  /* Stack children vertically */
+  gap: 1rem;               /* Consistent spacing between elements */
+  max-width: 400px;        /* Limit form width for readability */
+  margin: 1rem 0;          /* Vertical spacing around form */
+  padding: 1rem;           /* Inner spacing */
+  background: #f8f8f8;     /* Light background to stand out */
+  border-radius: 4px;      /* Rounded corners */
+}
+
+/* Container for each form field group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;             /* Space between label and input */
+}
+
+/* Style for all labels */
+.form-group label {
+  font-weight: bold;       /* Make labels stand out */
+}
+
+/* Required field indicator */
+.required {
+  color: red;              /* Red asterisk for required fields */
+  margin-left: 4px;        /* Space between label and asterisk */
+}
+
+/* Style for all inputs and selects */
+input, select {
+  padding: 0.5rem;         /* Internal spacing */
+  border: 1px solid #ddd;  /* Light border */
+  border-radius: 4px;      /* Rounded corners */
+  font-size: 1rem;         /* Readable text size */
+}
+
+/* Submit button styling */
+button[type="submit"] {
+  padding: 0.5rem 1rem;    /* Comfortable click target */
+  background: #0066cc;     /* Blue background */
+  color: white;            /* White text */
+  border: none;            /* Remove default border */
+  border-radius: 4px;      /* Match other border radii */
+  cursor: pointer;         /* Hand cursor on hover */
+  font-size: 1rem;         /* Match input text size */
+}
+
+/* Hover state for submit button */
+button[type="submit"]:hover {
+  background: #0052a3;     /* Darker blue on hover */
+}
+
+/* Style for task item */
+.task-item {
+  background: #f1f1f1;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Completed task style */
+.task-item.completed {
+  background: #d4edda;  /* Light green for completed tasks */
+}
+
+/* Hover effect for task item */
+.task-item:hover {
+  background: #f0f0f0;
+}
+
+/* Style for delete button */
+button {
+  padding: 0.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #c0392b;
+}
