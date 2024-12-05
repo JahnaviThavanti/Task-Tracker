@@ -229,8 +229,8 @@ return (
 ```
 ---
 # screenshot
-![image](![image1](https://github.com/user-attachments/assets/7d867892-8a65-48fd-af7e-0f5e8b84b307)
-![image](![image2](https://github.com/user-attachments/assets/eb84cacb-00e4-4f56-802b-622cc0fd1af9)
+![image1](https://github.com/user-attachments/assets/7d867892-8a65-48fd-af7e-0f5e8b84b307)
+![image2](https://github.com/user-attachments/assets/eb84cacb-00e4-4f56-802b-622cc0fd1af9)
 
 ---
 
