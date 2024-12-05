@@ -101,15 +101,15 @@ Task Tracker is a web application that helps you manage and organize your tasks 
 
 ### 1. Add Tasks
    - Fill in the task form and click "Add Task" to organize your tasks with titles, priorities, due dates, and categories.
-### 2. **Manage Tasks**
+### 2. Manage Tasks
    - Click a task to mark it as complete or incomplete, edit task details, or delete tasks as needed.
-### 3. **Recurring Tasks**
+### 3. Recurring Tasks
    - Set tasks to repeat daily, weekly, or monthly to handle recurring duties.
-### 4. **Notifications**
+### 4. Notifications
    - Get alerts for tasks due within the next 24 hours to stay on top of deadlines.
-### 5. **Track Progress**
+### 5. Track Progress
    - View the progress bar to see the percentage of completed tasks and stay motivated.
-### 6. **Dark Mode**
+### 6. Dark Mode
    - Toggle between light and dark modes for a comfortable viewing experience.
 
 ---
