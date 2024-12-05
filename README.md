@@ -122,111 +122,115 @@ This feature allows users to specify recurrence patterns for tasks (e.g., daily,
 
 To add the recurring task in the `AddTaskComponent`
 
-      ```jsx
+```jsx      
+useEffect(() => {
+const recurringInterval = setInterval(() => {
+const now = new Date();      
+const updatedTasks = tasks.map((task) => {
+  if (task.recurring !== 'None' && new Date(task.dueDate) <= now) {
+    const newDate = new Date(task.dueDate);
+      // Update due date based on recurrence frequency
+      if (task.recurring === 'Daily') newDate.setDate(newDate.getDate() + 1);
+      if (task.recurring === 'Weekly') newDate.setDate(newDate.getDate() + 7);
+      if (task.recurring === 'Monthly') newDate.setMonth(newDate.getMonth() + 1);
       
-        useEffect(() => {
-        const recurringInterval = setInterval(() => {
-          const now = new Date();
+      return {
+       ...task,
+       dueDate: newDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+       id: Date.now(), // Assign a new unique ID
+ };
+}
+ return task;
+ });
       
-          const updatedTasks = tasks.map((task) => {
-            if (task.recurring !== 'None' && new Date(task.dueDate) <= now) {
-              const newDate = new Date(task.dueDate);
+setTasks([...tasks, ...updatedTasks.filter((task) => task.id !== task.id)]);
+ }, 24 * 60 * 60 * 1000); // Check daily
       
-              // Update due date based on recurrence frequency
-              if (task.recurring === 'Daily') newDate.setDate(newDate.getDate() + 1);
-              if (task.recurring === 'Weekly') newDate.setDate(newDate.getDate() + 7);
-              if (task.recurring === 'Monthly') newDate.setMonth(newDate.getMonth() + 1);
-      
-              return {
-                ...task,
-                dueDate: newDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
-                id: Date.now(), // Assign a new unique ID
-              };
-            }
-            return task;
-          });
-      
-          setTasks([...tasks, ...updatedTasks.filter((task) => task.id !== task.id)]);
-        }, 24 * 60 * 60 * 1000); // Check daily
-      
-        return () => clearInterval(recurringInterval);
-      }, [tasks]);
+ return () => clearInterval(recurringInterval);
+}, [tasks]);
 
-      
-      ```
+```
       
 ## 2.  Task Notifications
 
 This feature notifies users about tasks that are due within the next 24 hours.
+```jsx
+useEffect(() => {
+  const notifyInterval = setInterval(() => {
+    const now = new Date();
 
-        ```jsx
-             useEffect(() => {
-        const notifyInterval = setInterval(() => {
-          const now = new Date();
-      
-          tasks.forEach((task) => {
-            const dueDate = new Date(task.dueDate);
-            const timeDifference = dueDate - now;
-      
-            if (timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000) {
-              // Notify about tasks due within the next 24 hours
-              alert(Task "${task.title}" is due soon!);
-            }
-          });
-        }, 60 * 60 * 1000); // Check every hour
-      
-        return () => clearInterval(notifyInterval); // Clean up interval on component unmount
-      }, [tasks]);
+    tasks.forEach((task) => {
+      const dueDate = new Date(task.dueDate);
+      const timeDifference = dueDate - now;
 
-      ```
+      if (timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000) {
+        // Notify about tasks due within the next 24 hours
+        alert(Task "${task.title}" is due soon!);
+      }
+    });
+  }, 60 * 60 * 1000); // Check every hour
+
+  return () => clearInterval(notifyInterval); // Clean up interval on component unmount
+}, [tasks]);
+```
       
 ## 3. Task Progress Tracking
+```jsx
+const calculateProgress = () => {
+  const completedTasks = tasks.filter((task) => task.completed).length;
+  const totalTasks = tasks.length;
+  return totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+};
 
-      ```jsx
-            const calculateProgress = () => {
-        const completedTasks = tasks.filter((task) => task.completed).length;
-        const totalTasks = tasks.length;
-        return totalTasks ? (completedTasks / totalTasks) * 100 : 0;
-      };
-      
-      <div className="progress-bar">
-        <div
-          className="progress"
-          style={{ width: ${calculateProgress()}% }}
-          aria-label={Progress: ${calculateProgress().toFixed(2)}%}
-        >
-          {calculateProgress().toFixed(2)}%
-        </div>
-      </div>;
-      
-      useEffect(() => {
-        console.log(Progress updated: ${calculateProgress().toFixed(2)}%);
-      }, [tasks]);
+<div className="progress-bar">
+  <div
+    className="progress"
+    style={{ width: ${calculateProgress()}% }}
+    aria-label={Progress: ${calculateProgress().toFixed(2)}%}
+  >
+    {calculateProgress().toFixed(2)}%
+  </div>
+</div>;
 
-  ## 4. Dark Mode
+useEffect(() => {
+  console.log(Progress updated: ${calculateProgress().toFixed(2)}%);
+}, [tasks]);
+```
+## 4. Dark Mode
 
-  Provides a toggle to switch between light and dark themes.
+Provides a toggle to switch between light and dark themes.
+```jsx
+// State to manage dark mode
+const [darkMode, setDarkMode] = useState(false);
 
-        ```
-                // State to Manage Dark Mode
-        const [darkMode, setDarkMode] = useState(false);
-        
-        // Toggle Function
-        const toggleDarkMode = () => {
-          setDarkMode(!darkMode);
-        };
-        
-        // Button to Toggle Dark Mode
-        <button onClick={toggleDarkMode}>
-          {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        </button>
-        
-        // Apply Theme to App
-        <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
-          {/* App Content */}
-        </div>
-        
-        ```
+return (
+  <div className={app ${darkMode ? 'dark-mode' : ''}}>
+    <h1>Task Tracker</h1>
+
+    {/* Toggle button for Dark Mode */}
+    <button onClick={() => setDarkMode(!darkMode)}>
+      {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+    </button>
+
+    {/* Components */}
+    <AddTaskForm onAdd={addTask} />
+    <div className="task-list">
+      {tasks.map((task) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          onToggle={() => toggleTask(task.id)}
+          onDelete={() => deleteTask(task.id)}
+        />
+      ))}
+    </div>
+  </div>
+);
+```
+---
+# screenshot
+![image1](https://github.com/user-attachments/assets/7d867892-8a65-48fd-af7e-0f5e8b84b307)
+![image2](https://github.com/user-attachments/assets/eb84cacb-00e4-4f56-802b-622cc0fd1af9)
 
 ---
 
