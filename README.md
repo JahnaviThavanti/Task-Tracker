@@ -122,9 +122,9 @@ This feature allows users to specify recurrence patterns for tasks (e.g., daily,
 
 To add the recurring task in the `AddTaskComponent`
 
-      ```
+      ```jsx
       
-             useEffect(() => {
+        useEffect(() => {
         const recurringInterval = setInterval(() => {
           const now = new Date();
       
@@ -151,12 +151,15 @@ To add the recurring task in the `AddTaskComponent`
       
         return () => clearInterval(recurringInterval);
       }, [tasks]);
+
+      
+      ```
       
 ## 2.  Task Notifications
 
 This feature notifies users about tasks that are due within the next 24 hours.
 
-        ```
+        ```jsx
              useEffect(() => {
         const notifyInterval = setInterval(() => {
           const now = new Date();
@@ -174,10 +177,12 @@ This feature notifies users about tasks that are due within the next 24 hours.
       
         return () => clearInterval(notifyInterval); // Clean up interval on component unmount
       }, [tasks]);
+
+      ```
       
 ## 3. Task Progress Tracking
 
-      ```
+      ```jsx
             const calculateProgress = () => {
         const completedTasks = tasks.filter((task) => task.completed).length;
         const totalTasks = tasks.length;
@@ -220,6 +225,8 @@ This feature notifies users about tasks that are due within the next 24 hours.
         <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
           {/* App Content */}
         </div>
+        
+        ```
 
 ---
 
