@@ -124,59 +124,79 @@ To add the recurring task in the `AddTaskComponent`
 
       ```
       
-        // AddTaskForm Component - Recurring Field
-        <div className="form-group">
-          <label htmlFor="recurring">Recurring:</label>
-          <select
-            id="recurring"
-            name="recurring"
-            value={formData.recurring}
-            onChange={handleChange}
-          >
-            <option value="None">None</option>
-            <option value="Daily">Daily</option>
-            <option value="Weekly">Weekly</option>
-            <option value="Monthly">Monthly</option>
-          </select>
-        </div>
-        
-        // TaskItem Component - Display Recurring Info
-        <p>Recurring: {task.recurring}</p>
-
+             useEffect(() => {
+        const recurringInterval = setInterval(() => {
+          const now = new Date();
+      
+          const updatedTasks = tasks.map((task) => {
+            if (task.recurring !== 'None' && new Date(task.dueDate) <= now) {
+              const newDate = new Date(task.dueDate);
+      
+              // Update due date based on recurrence frequency
+              if (task.recurring === 'Daily') newDate.setDate(newDate.getDate() + 1);
+              if (task.recurring === 'Weekly') newDate.setDate(newDate.getDate() + 7);
+              if (task.recurring === 'Monthly') newDate.setMonth(newDate.getMonth() + 1);
+      
+              return {
+                ...task,
+                dueDate: newDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+                id: Date.now(), // Assign a new unique ID
+              };
+            }
+            return task;
+          });
+      
+          setTasks([...tasks, ...updatedTasks.filter((task) => task.id !== task.id)]);
+        }, 24 * 60 * 60 * 1000); // Check daily
+      
+        return () => clearInterval(recurringInterval);
+      }, [tasks]);
+      
 ## 2.  Task Notifications
 
 This feature notifies users about tasks that are due within the next 24 hours.
 
         ```
-        // Notification Logic in useEffect
-        useEffect(() => {
-          const interval = setInterval(() => {
-              tasks.forEach((task) => {
-                if (new Date(task.dueDate) - new Date() <= 24 * 60 * 60 * 1000) {
-                  alert(`Task "${task.title}" is due soon!`);
-                }
-              });
-          }, 60 * 60 * 1000); // Check every hour
-        
-          return () => clearInterval(interval); // Cleanup on unmount
-        }, [tasks]);
-
+             useEffect(() => {
+        const notifyInterval = setInterval(() => {
+          const now = new Date();
+      
+          tasks.forEach((task) => {
+            const dueDate = new Date(task.dueDate);
+            const timeDifference = dueDate - now;
+      
+            if (timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000) {
+              // Notify about tasks due within the next 24 hours
+              alert(Task "${task.title}" is due soon!);
+            }
+          });
+        }, 60 * 60 * 1000); // Check every hour
+      
+        return () => clearInterval(notifyInterval); // Clean up interval on component unmount
+      }, [tasks]);
+      
 ## 3. Task Progress Tracking
 
-Displays the percentage of completed tasks using a progress bar.
-
       ```
-            // Progress Calculation
-      const completedTasks = tasks.filter((task) => task.completed).length;
-      const totalTasks = tasks.length;
-      const progress = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+            const calculateProgress = () => {
+        const completedTasks = tasks.filter((task) => task.completed).length;
+        const totalTasks = tasks.length;
+        return totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+      };
       
-      // Progress Bar Component
       <div className="progress-bar">
-        <div className="progress" style={{ width: `${progress}%` }}>
-          {progress.toFixed(2)}%
+        <div
+          className="progress"
+          style={{ width: ${calculateProgress()}% }}
+          aria-label={Progress: ${calculateProgress().toFixed(2)}%}
+        >
+          {calculateProgress().toFixed(2)}%
         </div>
-      </div>
+      </div>;
+      
+      useEffect(() => {
+        console.log(Progress updated: ${calculateProgress().toFixed(2)}%);
+      }, [tasks]);
 
   ## 4. Dark Mode
 
@@ -220,10 +240,6 @@ Displays the percentage of completed tasks using a progress bar.
 ### Challenge 4: **Dark Mode Implementation**
    - **Problem:** Toggling between light and dark modes while maintaining consistent styles across components.
    - **Solution:** Added a `darkMode` state and dynamically applied a `dark-mode` class to the root container. Used CSS to define specific styles for dark mode.
-
-### Challenge 5: **Category Selection**
-   - **Problem:** Sharing the list of categories across components without tightly coupling the components.
-   - **Solution:** Created a `CategoryContext` using React Context API to share category data globally, ensuring cleaner and reusable code.
 
 ---
 
