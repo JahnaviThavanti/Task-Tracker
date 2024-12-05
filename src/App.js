@@ -1,17 +1,13 @@
-import React, { useState, createContext, useContext } from 'react';
-
-// Create CategoryContext
-const CategoryContext = createContext([]);
+import React, { useState, useEffect } from 'react';
 
 // AddTaskForm Component
 function AddTaskForm({ onAdd }) {
-  const categories = useContext(CategoryContext); // Use categories from context
-
   const [formData, setFormData] = useState({
     title: '',
     priority: 'Medium',
     dueDate: '',
-    category: categories[0] || '', // Default to the first category or empty
+    category: 'Work',
+    recurring: 'None',
   });
 
   const handleChange = (e) => {
@@ -24,25 +20,27 @@ function AddTaskForm({ onAdd }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!formData.title.trim()) {
       alert('Please enter a task title');
       return;
     }
+
     onAdd(formData);
+
     setFormData({
       title: '',
       priority: 'Medium',
       dueDate: '',
-      category: categories[0] || '',
+      category: 'Work',
+      recurring: 'None',
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="add-task-form">
       <div className="form-group">
-        <label htmlFor="title">
-          Task Title: <span className="required">*</span>
-        </label>
+        <label htmlFor="title">Task Title: <span className="required">*</span></label>
         <input
           id="title"
           name="title"
@@ -83,11 +81,23 @@ function AddTaskForm({ onAdd }) {
           value={formData.category}
           onChange={handleChange}
         >
-          {categories.map((category, index) => (
-            <option key={index} value={category}>
-              {category}
-            </option>
-          ))}
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Shopping">Shopping</option>
+        </select>
+      </div>
+      <div className="form-group">
+        <label htmlFor="recurring">Recurring:</label>
+        <select
+          id="recurring"
+          name="recurring"
+          value={formData.recurring}
+          onChange={handleChange}
+        >
+          <option value="None">None</option>
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
         </select>
       </div>
       <button type="submit">Add Task</button>
@@ -106,9 +116,8 @@ function TaskItem({ task, onToggle, onDelete }) {
       <p>Priority: {task.priority}</p>
       {task.dueDate && <p>Due Date: {task.dueDate}</p>}
       <p>Category: {task.category}</p>
-      <button onClick={(e) => e.stopPropagation() || onDelete()}>
-        Delete
-      </button>
+      <p>Recurring: {task.recurring}</p>
+      <button onClick={(e) => { e.stopPropagation(); onDelete(); }}>Delete</button>
     </div>
   );
 }
@@ -116,7 +125,36 @@ function TaskItem({ task, onToggle, onDelete }) {
 // App Component
 export default function App() {
   const [tasks, setTasks] = useState([]);
-  const [categories] = useState(['Work', 'Personal', 'Shopping']); // Predefined categories
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const notifyInterval = setInterval(() => {
+      tasks.forEach((task) => {
+        if (new Date(task.dueDate) - new Date() <= 24 * 60 * 60 * 1000) {
+          alert(`Task "${task.title}" is due soon!`);
+        }
+      });
+    }, 60 * 60 * 1000); // Check hourly
+
+    return () => clearInterval(notifyInterval);
+  }, [tasks]);
+
+  useEffect(() => {
+    const recurringInterval = setInterval(() => {
+      tasks.forEach((task) => {
+        if (task.recurring !== 'None' && new Date(task.dueDate) <= new Date()) {
+          const newDate = new Date(task.dueDate);
+          if (task.recurring === 'Daily') newDate.setDate(newDate.getDate() + 1);
+          if (task.recurring === 'Weekly') newDate.setDate(newDate.getDate() + 7);
+          if (task.recurring === 'Monthly') newDate.setMonth(newDate.getMonth() + 1);
+
+          addTask({ ...task, id: tasks.length + 1, dueDate: newDate.toISOString().split('T')[0] });
+        }
+      });
+    }, 24 * 60 * 60 * 1000); // Check daily
+
+    return () => clearInterval(recurringInterval);
+  }, [tasks]);
 
   const addTask = (task) => {
     const newTask = { ...task, id: tasks.length + 1, completed: false };
@@ -135,22 +173,32 @@ export default function App() {
     setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const totalTasks = tasks.length;
+  const progress = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+
   return (
-    <CategoryContext.Provider value={categories}>
-      <div className="app">
-        <h1>Task Tracker</h1>
-        <AddTaskForm onAdd={addTask} />
-        <div className="task-list">
-          {tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={() => toggleTask(task.id)}
-              onDelete={() => deleteTask(task.id)}
-            />
-          ))}
+    <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
+      <h1>Task Tracker</h1>
+      <button onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      </button>
+      <AddTaskForm onAdd={addTask} />
+      <div className="progress-bar">
+        <div className="progress" style={{ width: `${progress}%` }}>
+          {progress.toFixed(2)}%
         </div>
       </div>
-    </CategoryContext.Provider>
+      <div className="task-list">
+        {tasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            onToggle={() => toggleTask(task.id)}
+            onDelete={() => deleteTask(task.id)}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
